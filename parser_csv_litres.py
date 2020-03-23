@@ -8,12 +8,19 @@ from datetime import datetime, timedelta
 class ParserCsv:
 # path = '/var/www/litres/2_5431638534144394596/Orders.csv'
     
-    def __init__(self):
+    def __init__(self, csv_path):
         self.sum_profit = 0
         self.profit_product = {}
         self.all_delivery_client = []
         self.avg_delivery_days = 0
         self.fieldnames = ['Product name', 'profit', 'quantity', 'sale']
+        
+        if os.path.isfile(csv_path):
+            with open(csv_path, "r") as csv_obj:
+                self.csv_reader(csv_obj)
+        else:
+            raise TypeError('Указанный путь не является файлом! Попробуйте еще раз')
+            
 
     # task 1
     def create_profit_product(self, product_id: str, profit: float, quantity: int) -> None:
@@ -107,12 +114,5 @@ class ParserCsv:
 
 
 if __name__ == "__main__": 
-    csv_path = os.path.normpath('/var/www/litres/2_5431638534144394596/Orders.csv')
-    # csv_path = os.path.normpath(input('input path for file.csv '))
-
-    if os.path.isfile(csv_path):
-        new_parser = ParserCsv()
-        with open(csv_path, "r") as csv_obj:
-            new_parser.csv_reader(csv_obj)
-    else:
-        print('Указанный путь не является файлом! Попробуйте еще раз')
+    csv_path = os.path.normpath(input('input path for file.csv '))
+    new_parser = ParserCsv(csv_path)
