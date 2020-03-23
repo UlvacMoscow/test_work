@@ -2,16 +2,19 @@ import os
 import csv
 from collections import OrderedDict
 from datetime import datetime, timedelta
+from typing import Dict
 
 
 
 class ParserCsv:
 # path = '/var/www/litres/2_5431638534144394596/Orders.csv'
     
-    def __init__(self, csv_path: str):
+    profit_product = {}
+    all_delivery_client = []
+    
+    
+    def __init__(self, csv_path: str) -> None:
         self.sum_profit = 0
-        self.profit_product = {}
-        self.all_delivery_client = []
         self.avg_delivery_days = 0
         self.fieldnames = ['Product name', 'profit', 'quantity', 'sale']
         
@@ -38,7 +41,7 @@ class ParserCsv:
         return OrderedDict(sorted(new_dict.items(), key=lambda t: t[1], reverse=True))
 
     #task 2 & 3
-    def write_out_top_product(self, sort_order_dict: dict, rank: int=10) -> None:
+    def write_out_top_product(self, sort_order_dict: Dict, rank: int=10) -> None:
         print('Топ - {} лучших товаров'.format(rank))
         print(list(sort_order_dict.items())[:rank])
         print('Топ - {} худших товаров товаров'.format(rank))
@@ -51,20 +54,16 @@ class ParserCsv:
         self.all_delivery_client.append((complited_delivery_data - create_order_data).days)
 
     #task 4
-    def write_out_avg_delivery(self) -> print:
+    def write_out_avg_delivery(self) -> None:
         avg_delivery_days = self.all_delivery_client
         sum_days = sum(avg_delivery_days)
         count_delivery = len(avg_delivery_days)
         self.avg_delivery_days = int(round(sum_days/count_delivery, 0))
-        return print('средний срок доставки {} дн.'.format(self.avg_delivery_days))
+        print('средний срок доставки {} дн.'.format(self.avg_delivery_days))
 
     # task 5
-    def avg_deviation_delivery(self) -> print:
-        def convert_delta_all_delivery(elem):
-            elem = elem - self.avg_delivery_days
-            elem = elem if elem >= 0 else elem * -1
-            return elem
-        delta_all_delivery = list(map(convert_delta_all_delivery, self.all_delivery_client))
+    def avg_deviation_delivery(self) -> None:
+        delta_all_delivery = list([abs(el) for el in self.avg_delivery_days])
         avg_deviation = int(round(sum(delta_all_delivery) / len(delta_all_delivery), 0))
         print('стандартное отклонение от среднего срока доставки {} дн.'.format(avg_deviation))
   
