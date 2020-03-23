@@ -2,28 +2,22 @@ import os
 import csv
 from collections import OrderedDict
 from datetime import datetime, timedelta
-from typing import Dict
-
 
 
 class ParserCsv:
-# path = '/var/www/litres/2_5431638534144394596/Orders.csv'
-    
+
     profit_product = {}
     all_delivery_client = []
-    
     
     def __init__(self, csv_path: str) -> None:
         self.sum_profit = 0
         self.avg_delivery_days = 0
         self.fieldnames = ['Product name', 'profit', 'quantity', 'sale']
-        
         if os.path.isfile(csv_path):
             self.path = csv_path
         else:
             raise TypeError('Указанный путь не является файлом! Попробуйте еще раз')
             
-
     # task 1
     def create_profit_product(self, product_id: str, profit: float, quantity: int) -> None:
         sale = 1 
@@ -41,9 +35,9 @@ class ParserCsv:
         return OrderedDict(sorted(new_dict.items(), key=lambda t: t[1], reverse=True))
 
     #task 2 & 3
-    def write_out_top_product(self, sort_order_dict: Dict, rank: int=10) -> None:
+    def write_out_top_product(self, sort_order_dict: dict, rank: int=10) -> None:
         print('Топ - {} лучших товаров'.format(rank))
-        print(list(sort_order_dict.items())[:rank])
+        print(list(sort_order_dict.items())[0:rank])
         print('Топ - {} худших товаров товаров'.format(rank))
         print(list(sort_order_dict.items())[:len(sort_order_dict.items()) - rank:-1])
 
@@ -63,7 +57,7 @@ class ParserCsv:
 
     # task 5
     def avg_deviation_delivery(self) -> None:
-        delta_all_delivery = list([abs(el) for el in self.avg_delivery_days])
+        delta_all_delivery = [abs(el - self.avg_delivery_days) for el in self.all_delivery_client]
         avg_deviation = int(round(sum(delta_all_delivery) / len(delta_all_delivery), 0))
         print('стандартное отклонение от среднего срока доставки {} дн.'.format(avg_deviation))
   
@@ -83,7 +77,6 @@ class ParserCsv:
             writer.writeheader()
             for value in csv_product_data:
                 writer.writerow(value)
-
 
     def counter_sum_profit(self, profit:float) -> None:
         if profit:
@@ -110,7 +103,6 @@ class ParserCsv:
             self.avg_deviation_delivery()
             self.csv_writer()
     
-
 
 if __name__ == "__main__": 
     csv_path = os.path.normpath(input('input path for file.csv '))
