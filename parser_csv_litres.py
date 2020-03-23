@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 class ParserCsv:
 # path = '/var/www/litres/2_5431638534144394596/Orders.csv'
     
-    def __init__(self, csv_path):
+    def __init__(self, csv_path: str):
         self.sum_profit = 0
         self.profit_product = {}
         self.all_delivery_client = []
@@ -16,8 +16,7 @@ class ParserCsv:
         self.fieldnames = ['Product name', 'profit', 'quantity', 'sale']
         
         if os.path.isfile(csv_path):
-            with open(csv_path, "r") as csv_obj:
-                self.csv_reader(csv_obj)
+            self.path = csv_path
         else:
             raise TypeError('Указанный путь не является файлом! Попробуйте еще раз')
             
@@ -39,14 +38,14 @@ class ParserCsv:
         return OrderedDict(sorted(new_dict.items(), key=lambda t: t[1], reverse=True))
 
     #task 2 & 3
-    def write_out_top_product(self, sort_order_dict, rank=10) -> None:
+    def write_out_top_product(self, sort_order_dict: dict, rank: int=10) -> None:
         print('Топ - {} лучших товаров'.format(rank))
         print(list(sort_order_dict.items())[:rank])
         print('Топ - {} худших товаров товаров'.format(rank))
         print(list(sort_order_dict.items())[:len(sort_order_dict.items()) - rank:-1])
 
     #task 4
-    def add_delta_delivery(self, order_data, delivery_data) -> None:
+    def add_delta_delivery(self, order_data: str, delivery_data: str) -> None:
         create_order_data = datetime.strptime(order_data, '%m/%d/%y').date()
         complited_delivery_data = datetime.strptime(delivery_data, '%m/%d/%y').date()        
         self.all_delivery_client.append((complited_delivery_data - create_order_data).days)
@@ -91,28 +90,31 @@ class ParserCsv:
         if profit:
             self.sum_profit += profit
 
-    def csv_reader(self, file_obj):
+    def csv_reader(self) -> None:
         """
         Read a csv file
         """
-        reader = csv.DictReader(file_obj, delimiter=';')
+        with open(self.path, "r") as csv_obj:
+            reader = csv.DictReader(csv_obj, delimiter=';')
 
-        for line in reader:
-            profit = float('.'.join(line["Profit"].split(',')))
-            quantity = int(line["Quantity"])
-            self.counter_sum_profit(profit) 
-            self.create_profit_product(line['Product Name'], profit, quantity)
-            self.add_delta_delivery(line['Order Date'], line['Ship Date'])
+            for line in reader:
+                profit = float('.'.join(line["Profit"].split(',')))
+                quantity = int(line["Quantity"])
+                self.counter_sum_profit(profit) 
+                self.create_profit_product(line['Product Name'], profit, quantity)
+                self.add_delta_delivery(line['Order Date'], line['Ship Date'])
 
-        print('Общий профит ', round(self.sum_profit, 2))
-        finish_profit = self.calculate_profit_product(self.profit_product)
-        self.write_out_top_product(finish_profit)
-        self.write_out_avg_delivery()
-        self.avg_deviation_delivery()
-        self.csv_writer()
-   
+            print('Общий профит ', round(self.sum_profit, 2))
+            finish_profit = self.calculate_profit_product(self.profit_product)
+            self.write_out_top_product(finish_profit)
+            self.write_out_avg_delivery()
+            self.avg_deviation_delivery()
+            self.csv_writer()
+    
 
 
 if __name__ == "__main__": 
     csv_path = os.path.normpath(input('input path for file.csv '))
     new_parser = ParserCsv(csv_path)
+    new_parser.csv_reader()
+
